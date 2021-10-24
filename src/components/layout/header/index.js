@@ -12,7 +12,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { Search, Clear } from "@mui/icons-material";
 import Typography from "@mui/material/Typography";
 import StickyHeader from "react-sticky-header";
 import "react-sticky-header/styles.css";
@@ -32,10 +32,13 @@ const style = {
 function Header(props) {
   const { title, cards, setDisplayCards } = props;
   const [open, setOpen] = useState(false);
+  const [searchActive, setSearchActive] = useState(false);
+
   const [issueType, setIssueType] = useState("EPIC");
   const [newtitle, setNewtitle] = useState("");
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const submitHandler = () => {
     if (newtitle === "") {
@@ -65,6 +68,90 @@ function Header(props) {
     setNewtitle("");
     setDescription("");
     setAssignedTo("");
+  };
+
+  const handleSearch = () => {
+    setSearchActive(true);
+    let newCards = cards;
+    for (const key in newCards) {
+      newCards[key].cards = newCards[key].cards.filter((card) =>
+        card.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setDisplayCards({ ...cards, ...newCards });
+  };
+
+  const clear = () => {
+    setSearchActive(false);
+    setSearchTerm("");
+    const cards = {
+      "TO DO": {
+        id: uuidv4(),
+        background: "#00b8ff",
+        cards: [
+          {
+            id: uuidv4(),
+            title: "Fix a major bug",
+            description: "This will break the entire system",
+            type: "BUG",
+            assignedTo: "Eric Bachman",
+          },
+        ],
+      },
+      "IN PROGRESS": {
+        id: uuidv4(),
+        background: "#1500ff",
+        cards: [
+          {
+            id: uuidv4(),
+            title: "Complete all awesome features",
+            description: "This will be the best feature we have developed yet",
+            type: "STORY",
+            assignedTo: "Pickle Rick",
+          },
+        ],
+      },
+      "DEV COMPLETE": {
+        id: uuidv4(),
+        background: "#3445c3",
+        cards: [
+          {
+            id: uuidv4(),
+            title: "Develop an awesome feature",
+            description: "This will be the best feature we have developed yet",
+            type: "TASK",
+            assignedTo: "Bertram Gilfoyle",
+          },
+        ],
+      },
+      "ON TEST": {
+        id: uuidv4(),
+        background: "#26477e",
+        cards: [
+          {
+            id: uuidv4(),
+            title: "MVP for our amazing product",
+            description: "This will be the best feature we have developed yet",
+            type: "EPIC",
+            assignedTo: "John Wick",
+          },
+        ],
+      },
+      DONE: {
+        id: uuidv4(),
+        background: "green",
+        cards: [
+          {
+            id: uuidv4(),
+            title: "Develop an awesome feature",
+            description: "This will be the best feature we have developed yet",
+            type: "TASK",
+            assignedTo: "Bertram Gilfoyle",
+          },
+        ],
+      },
+    };
+    setDisplayCards(JSON.parse(localStorage.getItem("prevState")) || cards);
   };
   return (
     <StickyHeader
@@ -130,8 +217,20 @@ function Header(props) {
           >
             {title}
           </Typography>
-          <IconButton>
-            <SearchIcon />
+          <Input
+            disabled={searchActive}
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.code === "Enter") {
+                handleSearch();
+              }
+            }}
+          ></Input>
+          <IconButton onClick={() => (searchActive ? clear() : handleSearch())}>
+            {searchActive ? <Clear /> : <Search />}
           </IconButton>
         </Toolbar>
       }
