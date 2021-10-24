@@ -39,6 +39,7 @@ function Header(props) {
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIssue, setSelectedIssue] = useState("ALL");
 
   const submitHandler = () => {
     if (newtitle === "") {
@@ -79,6 +80,20 @@ function Header(props) {
       );
     }
     setDisplayCards({ ...cards, ...newCards });
+  };
+
+  const filterByIssueType = (issueType) => {
+    setSelectedIssue(issueType);
+    clear();
+    if (issueType !== "ALL") {
+      let newCards = JSON.parse(localStorage.getItem("prevState"));
+      for (const key in newCards) {
+        newCards[key].cards = newCards[key].cards.filter(
+          (card) => card.type === issueType
+        );
+      }
+      setDisplayCards({ ...cards, ...newCards });
+    }
   };
 
   const clear = () => {
@@ -157,82 +172,107 @@ function Header(props) {
     <StickyHeader
       headerOnly={true}
       header={
-        <Toolbar
-          sx={{ borderBottom: 1, borderColor: "divider", background: "white" }}
-        >
-          {/* <Button href="https://www.buymeacoffee.com/ankitpawar" size="small">
-            Buy me a coffee
-          </Button> */}
-          <Button size="small" onClick={() => setOpen(true)}>
-            Create
-          </Button>
-          <Modal open={open}>
-            <Box sx={style}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Create Issue
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                <FormGroup>
-                  <InputLabel htmlFor="title">Title</InputLabel>
-                  <Input
-                    id="title"
-                    value={newtitle}
-                    onChange={(e) => setNewtitle(e.target.value)}
-                  />
-                  <InputLabel htmlFor="description">Description</InputLabel>
-                  <Input
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                  <InputLabel htmlFor="assignedTo">Assigned To</InputLabel>
-                  <Input
-                    value={assignedTo}
-                    onChange={(e) => setAssignedTo(e.target.value)}
-                    id="assignedTo"
-                  />
-                  <InputLabel htmlFor="issueType">Work Item Type</InputLabel>
-                  <Select
-                    id="issueType"
-                    value={issueType}
-                    onChange={(e) => setIssueType(e.target.value)}
-                  >
-                    <MenuItem value="EPIC">Epic</MenuItem>
-                    <MenuItem value="STORY">Story</MenuItem>
-                    <MenuItem value="TASK">Task</MenuItem>
-                    <MenuItem value="BUG">Bug</MenuItem>
-                  </Select>
-                  <Button onClick={() => submitHandler()}>Create</Button>
-                </FormGroup>
-              </Typography>
-            </Box>
-          </Modal>
-          <Typography
-            component="h2"
-            variant="h5"
-            color="inherit"
-            align="center"
-            noWrap
-            sx={{ flex: 1 }}
+        <>
+          <Toolbar
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              background: "white",
+            }}
           >
-            {title}
-          </Typography>
-          <Input
-            disabled={searchActive}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.code === "Enter") {
-                handleSearch();
-              }
-            }}
-          ></Input>
-          <IconButton onClick={() => (searchActive ? clear() : handleSearch())}>
-            {searchActive ? <Clear /> : <Search />}
-          </IconButton>
-        </Toolbar>
+            <Button href="https://www.buymeacoffee.com/ankitpawar" size="small">
+              Buy me a coffee
+            </Button>
+            <Button size="small" onClick={() => setOpen(true)}>
+              Create
+            </Button>
+            <Modal open={open}>
+              <Box sx={style}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Create Issue
+                </Typography>
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  <FormGroup>
+                    <InputLabel htmlFor="title">Title</InputLabel>
+                    <Input
+                      id="title"
+                      value={newtitle}
+                      onChange={(e) => setNewtitle(e.target.value)}
+                    />
+                    <InputLabel htmlFor="description">Description</InputLabel>
+                    <Input
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                    <InputLabel htmlFor="assignedTo">Assigned To</InputLabel>
+                    <Input
+                      value={assignedTo}
+                      onChange={(e) => setAssignedTo(e.target.value)}
+                      id="assignedTo"
+                    />
+                    <InputLabel htmlFor="issueType">Work Item Type</InputLabel>
+                    <Select
+                      id="issueType"
+                      value={issueType}
+                      onChange={(e) => setIssueType(e.target.value)}
+                    >
+                      <MenuItem value="EPIC">Epic</MenuItem>
+                      <MenuItem value="STORY">Story</MenuItem>
+                      <MenuItem value="TASK">Task</MenuItem>
+                      <MenuItem value="BUG">Bug</MenuItem>
+                    </Select>
+                    <Button onClick={() => submitHandler()}>Create</Button>
+                  </FormGroup>
+                </Typography>
+              </Box>
+            </Modal>
+            <Typography
+              component="h2"
+              variant="h5"
+              color="inherit"
+              align="center"
+              noWrap
+              sx={{ flex: 1 }}
+            >
+              {title}
+            </Typography>
+            <Input
+              disabled={searchActive}
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.code === "Enter") {
+                  handleSearch();
+                }
+              }}
+            ></Input>
+            <IconButton
+              onClick={() => (searchActive ? clear() : handleSearch())}
+            >
+              {searchActive ? <Clear /> : <Search />}
+            </IconButton>
+          </Toolbar>
+          <Toolbar
+            component="nav"
+            variant="dense"
+            sx={{ justifyContent: "space-between", overflowX: "auto" }}
+          >
+            <Select
+              id="issueType"
+              value={selectedIssue}
+              onChange={(e) => filterByIssueType(e.target.value)}
+            >
+              <MenuItem value="EPIC">Epic</MenuItem>
+              <MenuItem value="STORY">Story</MenuItem>
+              <MenuItem value="TASK">Task</MenuItem>
+              <MenuItem value="BUG">Bug</MenuItem>
+              <MenuItem value="ALL">All</MenuItem>
+            </Select>{" "}
+          </Toolbar>
+        </>
       }
     ></StickyHeader>
   );

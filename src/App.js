@@ -5,7 +5,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import Header from "./components/layout/header";
 import Footer from "./components/layout/footer";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Kanban from "./components/kanban";
 import uuidv4 from "uuid/v4";
@@ -81,6 +81,13 @@ function App() {
   const [displayCards, setDisplayCards] = useState(
     JSON.parse(localStorage.getItem("prevState")) || cards
   );
+
+  useEffect(() => {
+    if (!localStorage.getItem("prevState")) {
+      localStorage.setItem("prevState", JSON.stringify(cards));
+    }
+  }, []);
+
   return (
     <React.StrictMode>
       <Router>
