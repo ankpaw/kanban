@@ -84,7 +84,11 @@ function App() {
   return (
     <React.StrictMode>
       <Router>
-        <Header title="Kanban Board" />
+        <Header
+          cards={displayCards}
+          setDisplayCards={setDisplayCards}
+          title="Kanban Board"
+        />
         <Switch>
           <Route path="/">
             <Kanban cards={displayCards} setDisplayCards={setDisplayCards} />
