@@ -18,7 +18,9 @@ function Header(props) {
         <Toolbar
           sx={{ borderBottom: 1, borderColor: "divider", background: "white" }}
         >
-          <Button size="small">Buy me a coffee</Button>
+          <Button href="https://www.buymeacoffee.com/ankitpawar" size="small">
+            Buy me a coffee
+          </Button>
           <Typography
             component="h2"
             variant="h5"
